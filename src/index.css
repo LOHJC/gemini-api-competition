@@ -1,13 +1,28 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.textGemini {
+  @apply bg-gradient-to-r from-gemini-start to-gemini-end text-transparent bg-clip-text;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+.bgGemini {
+  @apply bg-gradient-to-r from-gemini-start to-gemini-end;
+}
+
+.bgGeminiReverse {
+  @apply bg-gradient-to-r from-gemini-end to-gemini-start;
+}
+
+.bgGeminiToBottom {
+  @apply bg-gradient-to-b from-gemini-start to-gemini-end;
+}
+
+.buttonActive {
+  @apply text-slate-50 bgGemini;
+}
+
+.buttonNotActive {
+  @apply textGemini;
+
 }
