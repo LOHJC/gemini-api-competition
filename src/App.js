@@ -11,7 +11,8 @@ import Settings from './pages/Settings';
 import Layout from './components/Layout';
 
 function App() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(null || JSON.parse(sessionStorage.getItem("user")));
+  const [goal, setGoal] = useState("stay healthy");
 
   return (
     <BrowserRouter>
@@ -21,9 +22,9 @@ function App() {
         {/* <Route index element={<Home user={user} setUser={setUser}/>} />
         <Route path="dashboard" element={<Dashboard user={user}/>}/>
         <Route path="settings" element={<Settings user={user} setUser={setUser}/>} /> */}
-        <Route path="/" element={<Layout user={user}/>}>
-          <Route path="/dashboard" element={<Dashboard user={user} setUser={setUser}/>} />
-          <Route path="/settings" element={<Settings user={user} setUser={setUser}/>} />
+        <Route path="/" element={<Layout user={user} setUser={setUser}/>}>
+          <Route path="/dashboard" element={<Dashboard user={user} setUser={setUser} goal={goal}/>} />
+          <Route path="/settings" element={<Settings user={user} setUser={setUser} goal={goal} setGoal={setGoal}/>} />
         </Route>
       </Routes>
     </BrowserRouter>

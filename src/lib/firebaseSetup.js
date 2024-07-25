@@ -31,7 +31,7 @@ const provider = new GoogleAuthProvider();
 provider.addScope('https://www.googleapis.com/auth/userinfo.email');
 provider.addScope('https://www.googleapis.com/auth/userinfo.profile');
 
-const signInWithGoogle = (setUser) => {
+const signInWithGoogle = () => {
     return signInWithPopup(auth, provider).then((result) => {
         // This gives you a Google Access Token. You can use it to access the Google API.
         const credential = GoogleAuthProvider.credentialFromResult(result);
@@ -42,6 +42,8 @@ const signInWithGoogle = (setUser) => {
         const additionalUserInfo = getAdditionalUserInfo(result);
       
         // Extract profile picture and name
+        //user.photoURL, user.displayName, user.email
+        
         // ...
         }).catch((error) => {
             // Handle Errors here.
