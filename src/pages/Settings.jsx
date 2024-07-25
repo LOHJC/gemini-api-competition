@@ -1,37 +1,25 @@
 
+import { useEffect } from "react";
 import Layout from "../components/Layout";
-import { onAuthStateChanged, signOut } from 'firebase/auth';
-import {app, auth, signInWithGoogle} from "../lib/firebaseSetup";
 import { useNavigate } from "react-router-dom";
 
-function Settings({user,setUser}) {
+function Settings({user, setUser, goal, setGoal}) {
+  const handleChange = (event) => {
+    const newValue = event.target.value;
+    setGoal(newValue);
 
-  const navigate = useNavigate()
-
-    const handleSignOut = async () => {
-        try {
-          await signOut(auth);
-          setUser(null);
-          navigate("/");
-        } catch (error) {
-          console.error("Error signing out:", error);
-        }
-      };
-
+  }
     return (
-        // <Layout user={user}>
-        //     <h5 className="h-full text-center bg-slate-950 text-white">
-        //     {/* <div>user.name</div> */}
-        //     <button onClick={handleSignOut} className={`buttonActive rounded hover:font-bold w-20`}>Sign Out</button>
-        //     </h5>
-        // </Layout>
-
-        
-        <h5 className="h-full text-center bg-slate-950 text-white">
+        <div className="h-full text-center bg-slate-950 text-white">
+            <div className="font-bold text-3xl">Settings</div>
           <div className="font-semibold">{user.displayName}</div>
           <div className="font-semibold">{user.email}</div>
-          <button onClick={handleSignOut} className={`buttonActive rounded hover:font-bold w-20`}>Sign Out</button>
-        </h5>
+          <select className="dropdownContainer" value={goal} onChange={handleChange}>
+            <option className="dropdownOption" value="stay healthy">Stay Healthy</option>
+            <option className="dropdownOption"  value="weight loss">Weight Loss</option>
+            <option className="dropdownOption"  value="gain muscle">Gain Muscle</option>
+          </select>
+        </div>
     );
 }
 

@@ -14,14 +14,19 @@ function Home({user,setUser}) {
   const [isLoaded, setIsLoaded] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(()=> {
-      if (user)
-        navigate("/dashboard");
-  },[user]);
+  // useEffect(()=> {
+  //     if (user)
+  //       navigate("/dashboard");
+  // },[user]);
 
   //set the user here
   onAuthStateChanged(auth, (currentUser) => {
-    setUser(currentUser);
+    if (currentUser && !user) //user first login
+    {
+      setUser(currentUser);
+      sessionStorage.setItem("diet.ai-user",JSON.stringify(currentUser));
+      navigate("/dashboard");
+    }
   });
 
   const handleSignIn = async () => {
@@ -40,9 +45,9 @@ function Home({user,setUser}) {
       <p className="text-white text-center font-semibold text-3xl">Plan your diet with <span className="textGemini">Gemini</span> AI</p>
       <button onClick={handleSignIn} className={`mx-auto my-2 text-white font-semibold py-1 px-2 rounded bgGemini hover:from-gemini-end hover:to-gemini-start`}><FontAwesomeIcon icon={faGoogle}/> Sign in with Google
       </button>
-      <button className='text-white text-center' onClick={()=>{
+      {/* <button className='text-white text-center' onClick={()=>{
         navigate("/dashboard");
-      }}>Go To Dashboard</button>
+      }}>Go To Dashboard</button> */}
     </div>
   );
 }
