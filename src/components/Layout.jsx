@@ -19,7 +19,7 @@ export default function Layout({ user,setUser }) {
     if(isLoaded)
     {
         return (
-            <div className="flex flex-row h-screen">
+            <div className="flex flex-row min-h-screen h-full">
                 <Navbar classFromOutside={"flex-1"} user={user} setUser={setUser}>
                 </Navbar>
                 <div className="w-full"><Outlet /></div>

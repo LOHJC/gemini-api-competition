@@ -4,23 +4,38 @@ import Layout from "../components/Layout";
 import { useEffect, useRef, useState } from "react";
 import { model} from "../lib/geminiSetup";
 
-function Dashboard({user, goal}) {
-    const [recipeOfTheDay, setRecipeOfTheDay] = useState("");
+function Dashboard({user, goal, height, weight, recipeOfTheDay, setRecipeOfTheDay}) {
     const buttonRef = useRef(null);
 
     const formatRecipe = (recipeData) => {
-        return `
-        Recipe Title: ${recipeData.recipe_title}
+        if (recipeData == "") {
+            return <div></div>
+        }
 
-        Ingredients:
-        ${recipeData.ingredients.map(ingredient => `- ${ingredient}`).join('\n')}
+        recipeData = JSON.parse(recipeData);
+        return (
+            <div className="m-2 border-solid border-2 border-slate-300  text-slate-50 rounded inline-block">
+                <div className="text-xl font-bold bgGemini">Recipe of the day</div>
+                <div className="text-xl font-bold ">{recipeData.recipe_title}
+                    <span className="text-xs font-normal text-slate-300"> {recipeData.estimated_calories} calories</span>
+                </div>
+                <div>
+                    <span className="text-center inline-block w-full text-slate-300 font-bold">Ingredients:</span>
+                    <ul className="list-disc list-inside text-left inline-block mx-auto">
+                    {recipeData.ingredients.map((ingredient,index) => (<li key={index}>{ingredient}</li>))}
+                    </ul>
+                </div>
 
-        Preparation Steps:
-        ${recipeData.preparation_steps.map((step, index) => `${index + 1}. ${step}`).join('\n')}
+                <div>
+                    <span className="text-center inline-block w-full text-slate-300 font-bold">Preparation Steps:</span>
+                    <ol className="list-decimal list-inside text-left inline-block w-96">
+                    {recipeData.preparation_steps.map((step, index) => (<li key={index}>{step}</li>))}
+                    </ol>
+                </div>
 
-        Day of Today: ${recipeData.day_of_today}
-        Estimated Calories: ${recipeData.estimated_calories}
-        `;
+                {/* <div>Day of Today:<br/>{recipeData.day_of_today}</div> */}
+            </div>
+        )
 
     }
 
@@ -33,7 +48,7 @@ function Dashboard({user, goal}) {
         //clear previous recipe
         setRecipeOfTheDay("");
 
-        const prompt = `My final goal is to ${goal}, recommend the recipe for today. return data recipe_title in string, ingredients in string list, preparation_steps in string list, day_of_today and estimated_calories`;
+        const prompt = `I am ${height}cm and ${weight}kg. My goal is to ${goal}, recommend the recipe for today. return data recipe_title in string, ingredients in string list, preparation_steps in string list, day_of_today and estimated_calories`;
         // console.log(prompt);
 
         const result = await model.generateContent(prompt);
@@ -51,12 +66,11 @@ function Dashboard({user, goal}) {
     }
 
     return (
-        <div className="h-full text-center bg-slate-950 text-white">
-            <div className="font-bold text-3xl">Dashboard</div>
-            <div>{user.displayName}'s goal: <span className="capitalize">{goal}</span></div>
+        <div className="min-h-screen h-full text-center bg-slate-950 text-slate-50">
+            <div className="mx-auto font-extrabold text-3xl textGemini inline">Dashboard</div>
+            {/* <div>{user.displayName}'s goal: <span className="capitalize">{goal}</span></div> */}
+            <div>{formatRecipe(recipeOfTheDay)}</div>
             <button ref={buttonRef} className="buttonActive w-40" onClick={generateRecipeOfTheDay}>Im feeling lucky</button>
-            <div>Recipe of the day</div>
-            <div>{recipeOfTheDay}</div>
         </div>
     );
 }

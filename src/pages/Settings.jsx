@@ -1,26 +1,90 @@
 
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import Layout from "../components/Layout";
 import { useNavigate } from "react-router-dom";
 
-function Settings({user, setUser, goal, setGoal}) {
-  const handleChange = (event) => {
-    const newValue = event.target.value;
-    setGoal(newValue);
+function Settings({user, setUser, goal, setGoal, height, setHeight, weight, setWeight}) {
+  const [localGoal, setLocalGoal] = useState("stay healthy");
+  const [localHeight, setLocalHeight] = useState(175);
+  const [localWeight, setLocalWeight] = useState(75);
 
+  const heightEdit = useRef(null);
+  const weightEdit = useRef(null);
+  const goalSelect = useRef(null);
+
+  useEffect(()=>{
+    setLocalGoal(goal);
+  },[goal]);
+  
+  useEffect(()=>{
+    setLocalHeight(height);
+  },[height]);
+  
+  useEffect(()=>{
+    setLocalWeight(weight);
+  },[weight]);
+
+  const verifyInputNumber = (value) => {
+    if((value === '' || !isNaN(value)) && !isNaN(parseFloat(value))) {
+      return true;
+    }
+    else {
+      return false;
+    }
   }
-    return (
-        <div className="h-full text-center bg-slate-950 text-white">
-            <div className="font-bold text-3xl">Settings</div>
-          <div className="font-semibold">{user.displayName}</div>
-          <div className="font-semibold">{user.email}</div>
-          <select className="dropdownContainer" value={goal} onChange={handleChange}>
+
+  const saveSettings = () => {
+    setGoal(localGoal);
+    goalSelect.current.classList.add("outline-green-500");
+    if (verifyInputNumber(localHeight)){
+      setHeight(localHeight);
+      heightEdit.current.classList.add("outline-green-500");
+      heightEdit.current.classList.remove("outline-red-500");
+    }
+    else {
+      heightEdit.current.classList.add("outline-red-500");
+      heightEdit.current.classList.remove("outline-green-500");
+    }
+    if (verifyInputNumber(localWeight)){
+      setWeight(localWeight);
+      weightEdit.current.classList.add("outline-green-500");
+      weightEdit.current.classList.remove("outline-red-500");
+    }
+    else {
+      weightEdit.current.classList.add("outline-red-500");
+      weightEdit.current.classList.remove("outline-green-500");
+    }
+  }
+
+  const clearOutline = () => {
+    heightEdit.current.classList.remove("outline-green-500","outline-red-500");
+    weightEdit.current.classList.remove("outline-green-500","outline-red-500");
+    goalSelect.current.classList.remove("outline-green-500","outline-red-500");
+  }
+
+  return (
+      <div className="min-h-screen h-full text-center bg-slate-950 text-slate-50">
+          <div className="font-extrabold text-3xl textGemini inline">Settings</div>
+        <div className="font-semibold">{user.displayName}</div>
+        <div className="font-semibold">{user.email}</div>
+        <div className="relative m-3 flex items-center text-slate-950 w-52 mx-auto">
+          <span className="absolute left-3">cm</span>
+          <input className="text-left rounded w-full pl-12 py-2 outline outline-offset-2" onSelect={clearOutline} ref={heightEdit} placeholder="Height (cm)" value={localHeight} onChange={(event)=>{setLocalHeight(event.target.value)}}></input>
+        </div>
+        <div className="relative m-3 flex items-center text-slate-950 w-52 mx-auto">
+          <span className="absolute left-3">kg</span>
+          <input className="text-left rounded w-full pl-12 py-2 outline outline-offset-2" onSelect={clearOutline} ref={weightEdit} placeholder="Weight (kg)" value={localWeight} onChange={(event)=>{setLocalWeight(event.target.value)}}></input>
+        </div>
+        <div>
+          <select className="dropdownContainer outline outline-offset-2" ref={goalSelect} value={localGoal} onClick={clearOutline} onChange={(event)=>{setLocalGoal(event.target.newValue)}}>
             <option className="dropdownOption" value="stay healthy">Stay Healthy</option>
             <option className="dropdownOption"  value="weight loss">Weight Loss</option>
             <option className="dropdownOption"  value="gain muscle">Gain Muscle</option>
           </select>
         </div>
-    );
+        <button className="buttonActive w-20" onClick={saveSettings}>Save</button>
+      </div>
+  );
 }
 
 export default Settings;

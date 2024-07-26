@@ -23,7 +23,7 @@ export default function Navbar({classFromOutside,user,setUser}) {
     const pathname = location.pathname;
     return (
         <div className={classFromOutside}>
-            <nav className={` bg-slate-50 flex flex-col text-center h-screen`}>
+            <nav className={` bg-slate-50 flex flex-col text-center min-h-screen h-full`}>
                <div className='m-2 border-solid border-2 border-slate-300 rounded'>
                   <img alt="profile-pic" className="rounded-full w-20 h-20 mx-auto my-2 border-dashed border-2 border-slate-300" src={user.photoURL}></img>
                   <button onClick={handleSignOut} className={"textGemini border-dashed border-2 border-slate-300 rounded-full hover:font-semibold w-20 h-10 my-2"}>Sign Out</button>
