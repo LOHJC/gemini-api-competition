@@ -76,10 +76,10 @@ function Settings({user, setUser, goal, setGoal, height, setHeight, weight, setW
           <input className="text-left rounded w-full pl-12 py-2 outline outline-offset-2" onSelect={clearOutline} ref={weightEdit} placeholder="Weight (kg)" value={localWeight} onChange={(event)=>{setLocalWeight(event.target.value)}}></input>
         </div>
         <div>
-          <select className="dropdownContainer outline outline-offset-2" ref={goalSelect} value={localGoal} onClick={clearOutline} onChange={(event)=>{setLocalGoal(event.target.newValue)}}>
+          <select className="dropdownContainer outline outline-offset-2" ref={goalSelect} value={localGoal} onClick={clearOutline} onChange={(event)=>{setLocalGoal(event.target.value)}}>
             <option className="dropdownOption" value="stay healthy">Stay Healthy</option>
-            <option className="dropdownOption"  value="weight loss">Weight Loss</option>
-            <option className="dropdownOption"  value="gain muscle">Gain Muscle</option>
+            <option className="dropdownOption" value="weight loss">Weight Loss</option>
+            <option className="dropdownOption" value="gain muscle">Gain Muscle</option>
           </select>
         </div>
         <button className="buttonActive w-20" onClick={saveSettings}>Save</button>

@@ -29,6 +29,7 @@ export default function Navbar({classFromOutside,user,setUser}) {
                   <button onClick={handleSignOut} className={"textGemini border-dashed border-2 border-slate-300 rounded-full hover:font-semibold w-20 h-10 my-2"}>Sign Out</button>
                 </div>
                 <Link className={`link ${pathname === '/dashboard' ? `buttonActive` : `buttonNotActive`}`} to="/dashboard">Dashboard</Link>
+                <Link className={`link ${pathname === '/recipes' ? `buttonActive` : `buttonNotActive`}`} to="/recipes">Recipes</Link>
                 <Link className={`link ${pathname === '/settings' ? `buttonActive` : `buttonNotActive`}`} to="/settings">Settings</Link>
             </nav>
         </div>

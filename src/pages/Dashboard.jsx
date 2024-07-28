@@ -4,72 +4,120 @@ import Layout from "../components/Layout";
 import { useEffect, useRef, useState } from "react";
 import { model} from "../lib/geminiSetup";
 
-function Dashboard({user, goal, height, weight, recipeOfTheDay, setRecipeOfTheDay}) {
+function Dashboard({user, goal, height, weight, recipes, setRecipes, generating, setGenerating}) {
     const buttonRef = useRef(null);
+    
+    const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const today = new Date();
+    const dayIndex = today.getDay();
 
-    const formatRecipe = (recipeData) => {
-        if (recipeData == "") {
+    useEffect(()=> {
+        const button = buttonRef.current;
+        if (button) {
+            if (generating) {                
+                button.disabled = true;
+                button.textContent = 'Forming recipe...';
+                button.classList.add('cursor-not-allowed');
+            }
+            else {
+
+                button.disabled = false;
+                button.textContent = 'Im feeling lucky';
+                button.classList.remove('cursor-not-allowed');
+            }
+        }
+    },[generating]);
+
+    const formatRecipe = (recipeJson) => {
+        if (Object.keys(recipeJson).length === 0) {
             return <div></div>
         }
-
-        recipeData = JSON.parse(recipeData);
         return (
-            <div className="m-2 border-solid border-2 border-slate-300  text-slate-50 rounded inline-block">
-                <div className="text-xl font-bold bgGemini">Recipe of the day</div>
-                <div className="text-xl font-bold ">{recipeData.recipe_title}
-                    <span className="text-xs font-normal text-slate-300"> {recipeData.estimated_calories} calories</span>
+            <div className="mx-auto m-2 border-solid border-2 border-slate-300  text-slate-50 rounded flex justify-center flex-col items-center w-10/12 min-w-min">
+                <div className="text-xl font-bold bgGemini w-full">Recipe of the day</div>
+                <div className="text-xl font-bold ">{recipeJson.recipe_title}
+                    <span className="text-xs font-normal text-slate-300"> {recipeJson.estimated_calories} calories</span>
                 </div>
-                <div>
-                    <span className="text-center inline-block w-full text-slate-300 font-bold">Ingredients:</span>
-                    <ul className="list-disc list-inside text-left inline-block mx-auto">
-                    {recipeData.ingredients.map((ingredient,index) => (<li key={index}>{ingredient}</li>))}
-                    </ul>
-                </div>
-
-                <div>
-                    <span className="text-center inline-block w-full text-slate-300 font-bold">Preparation Steps:</span>
-                    <ol className="list-decimal list-inside text-left inline-block w-96">
-                    {recipeData.preparation_steps.map((step, index) => (<li key={index}>{step}</li>))}
-                    </ol>
+                <div className="m-3">
+                    <div className="text-center w-full text-slate-300 font-bold">Ingredients:</div>
+                    <div>
+                        <ul className="list-disc list-inside text-left">
+                        {recipeJson.ingredients.map((ingredient,index) => (<li key={index}>{ingredient}</li>))}
+                        </ul>
+                    </div>
                 </div>
 
-                {/* <div>Day of Today:<br/>{recipeData.day_of_today}</div> */}
+                <div className="m-3">
+                    <div className="text-center w-full text-slate-300 font-bold">Preparation Steps:</div>
+                    <div className="mx-auto">
+                        <ol className="list-decimal list-inside text-left">
+                        {recipeJson.preparation_steps.map((step, index) => (<li key={index}>{step}</li>))}
+                        </ol>
+                    </div>
+                    
+                </div>
+
+                {/* <div>Day of Today:<br/>{recipeJson.day_of_today}</div> */}
             </div>
         )
 
     }
 
     const generateRecipeOfTheDay = async () => {
-
-        const button = buttonRef.current;
-        button.disabled = true;
-        button.textContent = 'Forming Recipe...';
-        button.classList.add('cursor-not-allowed');
         //clear previous recipe
-        setRecipeOfTheDay("");
+        let nextRecipes = []
+        if (recipes.length) {
+            nextRecipes = recipes.map((recipe, index) => {
+            if (index === dayIndex) {
+                return {};
+            } else {
+                return recipe;
+            }
+            });
+        }
+        setRecipes(nextRecipes);
 
-        const prompt = `I am ${height}cm and ${weight}kg. My goal is to ${goal}, recommend the recipe for today. return data recipe_title in string, ingredients in string list, preparation_steps in string list, day_of_today and estimated_calories`;
+        const prompt = `I am ${height}cm and ${weight}kg. My goal is to ${goal}, recommend the recipe for ${days[dayIndex]}. return data recipe_title in string, ingredients in string list, preparation_steps in string list, day_of_today and estimated_calories`;
         // console.log(prompt);
 
+        setGenerating(true);
         const result = await model.generateContent(prompt);
-        //console.log(result); //for json mode
         const recipeResponse = result.response.candidates[0].content.parts[0].text;
-
-        const recipeData = JSON.parse(recipeResponse);
+        setGenerating(false);
 
         // Step 3: Format and display the extracted information
-        //const formattedOutput = formatRecipe(recipeData);
-        setRecipeOfTheDay(recipeResponse);
-        button.disabled = false;
-        button.textContent = 'Im feeling lucky';
-        button.classList.remove('cursor-not-allowed');
+        const recipeJson = JSON.parse(recipeResponse);
+        if (recipes.length != 0 && Object.keys(recipeJson).length != 0) {
+            nextRecipes = recipes.map((recipe, index) => {
+            if (index === dayIndex) {
+                return recipeJson;
+            } else {
+                return recipe;
+            }
+            });
+        }
+        else if(Object.keys(recipeJson).length > 0){
+            if (recipes.length == 0) {
+                //recipes list are empty
+                nextRecipes = []
+                for (let i=0; i<7; i++) {
+                    if (i==dayIndex) {
+                        nextRecipes.push(recipeJson)
+                    }
+                    else {
+                        nextRecipes.push({});
+                    }
+                }
+            }
+        }
+        setRecipes(nextRecipes);
     }
 
     return (
         <div className="min-h-screen h-full text-center bg-slate-950 text-slate-50">
             <div className="mx-auto font-extrabold text-3xl textGemini inline">Dashboard</div>
             {/* <div>{user.displayName}'s goal: <span className="capitalize">{goal}</span></div> */}
-            <div>{formatRecipe(recipeOfTheDay)}</div>
+            <div>{recipes.length>0?formatRecipe(recipes[dayIndex]):""}</div>
             <button ref={buttonRef} className="buttonActive w-40" onClick={generateRecipeOfTheDay}>Im feeling lucky</button>
         </div>
     );
