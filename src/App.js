@@ -36,8 +36,8 @@ function App() {
           <Route path="dashboard" element={<Dashboard user={user}/>}/>
           <Route path="settings" element={<Settings user={user} setUser={setUser}/>} /> */}
           <Route path="/" element={<Layout user={user} setUser={setUser}/>}>
-          <Route path="/dashboard" element={<Dashboard user={user} setUser={setUser} goal={goal} height={height} weight={weight} recipes={recipes} setRecipes={setRecipes} generating={generating} setGenerating={setGenerating}/>} />
-          <Route path="/recipes" element={<Recipes user={user} setUser={setUser} goal={goal} height={height} weight={weight} recipes={recipes} setRecipes={setRecipes} generating={generating} setGenerating={setGenerating}/>} />
+            <Route path="/dashboard" element={<Dashboard user={user} setUser={setUser} goal={goal} height={height} weight={weight} recipes={recipes} setRecipes={setRecipes} generating={generating} setGenerating={setGenerating}/>} />
+            <Route path="/recipes" element={<Recipes user={user} setUser={setUser} goal={goal} height={height} weight={weight} recipes={recipes} setRecipes={setRecipes} generating={generating} setGenerating={setGenerating}/>} />
             <Route path="/settings" element={<Settings user={user} setUser={setUser} goal={goal} setGoal={setGoal} height={height} setHeight={setHeight} weight={weight} setWeight={setWeight}/>} />
           </Route>
         </Routes>
