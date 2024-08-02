@@ -1,10 +1,9 @@
 
-import { useNavigate } from "react-router-dom";
-import Layout from "../components/Layout";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { model} from "../lib/geminiSetup";
+import { addAndUpdateRecipe, getGeneratedCount, decreaseGeneratedCount } from "../components/Database";
 
-function Recipes({user, goal, height, weight, recipes, setRecipes, generating, setGenerating}) {
+function Recipes({user, goal, height, weight, recipes, setRecipes, generating, setGenerating, aiCount, setAICount}) {
     const buttonRef = useRef(null);
 
     useEffect(()=> {
@@ -12,16 +11,25 @@ function Recipes({user, goal, height, weight, recipes, setRecipes, generating, s
         if (button) {
             if (generating) {                
                 button.disabled = true;
-                button.textContent = 'Forming recipes...';
+                button.textContent = `Forming recipes (${aiCount})`;
                 button.classList.add('cursor-not-allowed');
             }
             else {
                 button.disabled = false;
-                button.textContent = 'New recipes';
+                button.textContent = `New recipes (${aiCount})`;
                 button.classList.remove('cursor-not-allowed');
             }
+
+            if (aiCount <= 0) {                
+                button.classList.add('cursor-not-allowed');
+            }
         }
-    },[generating]);
+    },[generating,aiCount]);
+
+    
+    const addRecipes = async (recipe, index) => {
+        await addAndUpdateRecipe(user.uid,index.toString(),recipe);
+    }
 
     const formatRecipes = (recipesArray) => {
         // console.log(recipesArray)
@@ -60,7 +68,8 @@ function Recipes({user, goal, height, weight, recipes, setRecipes, generating, s
                             day = recipeJson.day_of_today;
                         }
                     }
-                    return (<div className="mx-0.5 m-2 border-solid border-2 border-slate-300  text-slate-50 rounded flex flex-col items-center w-3/12 min-w-min">
+
+                    return (<div key={index} className="mx-0.5 m-2 border-solid border-2 border-slate-300  text-slate-50 rounded flex flex-col items-center w-3/12 min-w-min">
                         <div className="text-xl font-bold bg-slate-50 text-slate-950 w-full">Recipe for <span className="textGemini">{day}</span></div>
                         <div className="text-xl font-bold ">{recipe_name}
                             <span className="text-xs font-normal text-slate-300"> {calories} calories</span>
@@ -92,7 +101,14 @@ function Recipes({user, goal, height, weight, recipes, setRecipes, generating, s
     }
 
     const generateRecipes = async () => {
-        const button = buttonRef.current;
+        //check the current AI generated count
+        if (aiCount <= 0) {
+            return;
+        }
+        else {
+            decreaseGeneratedCount(user.uid);
+            setAICount(aiCount-1);
+        }
 
         //clear previous recipe
         setRecipes([]);
@@ -105,8 +121,14 @@ function Recipes({user, goal, height, weight, recipes, setRecipes, generating, s
         setGenerating(false);
 
         // Step 3: Format and display the extracted information
-        const recipeJson = JSON.parse(recipeResponse)
-        const recipeArray = recipeJson.recipes
+        const recipeJson = JSON.parse(recipeResponse);
+        const recipeArray = recipeJson.recipes;
+        
+        recipeArray.map((recipe,index)=>{
+            addRecipes(recipe,index);
+            return 1;
+        });
+
         setRecipes(recipeArray);
     }
 

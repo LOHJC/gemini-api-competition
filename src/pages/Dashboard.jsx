@@ -3,8 +3,9 @@ import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 import { useEffect, useRef, useState } from "react";
 import { model} from "../lib/geminiSetup";
+import { addAndUpdateRecipe, getGeneratedCount, decreaseGeneratedCount } from "../components/Database";
 
-function Dashboard({user, goal, height, weight, recipes, setRecipes, generating, setGenerating}) {
+function Dashboard({user, goal, height, weight, recipes, setRecipes, generating, setGenerating, aiCount, setAICount}) {
     const buttonRef = useRef(null);
     
     const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -16,17 +17,22 @@ function Dashboard({user, goal, height, weight, recipes, setRecipes, generating,
         if (button) {
             if (generating) {                
                 button.disabled = true;
-                button.textContent = 'Forming recipe...';
+                button.textContent = `Forming recipe (${aiCount})`;
                 button.classList.add('cursor-not-allowed');
             }
             else {
 
                 button.disabled = false;
-                button.textContent = 'Im feeling lucky';
+                button.textContent = `Im feeling lucky (${aiCount})`;
                 button.classList.remove('cursor-not-allowed');
             }
+
+            if (aiCount <= 0) {        
+                button.disabled = true;            
+                button.classList.add('cursor-not-allowed');
+            }
         }
-    },[generating]);
+    },[generating,aiCount]);
 
     const formatRecipe = (recipeJson) => {
         if (Object.keys(recipeJson).length === 0) {
@@ -64,6 +70,15 @@ function Dashboard({user, goal, height, weight, recipes, setRecipes, generating,
     }
 
     const generateRecipeOfTheDay = async () => {
+        //check the current AI generated count
+        if (aiCount <= 0) {
+            return;
+        }
+        else {
+            decreaseGeneratedCount(user.uid);
+            setAICount(aiCount-1);
+        }
+
         //clear previous recipe
         let nextRecipes = []
         if (recipes.length) {
@@ -102,6 +117,7 @@ function Dashboard({user, goal, height, weight, recipes, setRecipes, generating,
                 nextRecipes = []
                 for (let i=0; i<7; i++) {
                     if (i==dayIndex) {
+                        await addAndUpdateRecipe(user.uid,i.toString(),recipeJson);
                         nextRecipes.push(recipeJson)
                     }
                     else {

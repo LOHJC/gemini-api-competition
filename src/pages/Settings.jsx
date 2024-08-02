@@ -1,10 +1,8 @@
 
 import { useEffect, useRef, useState } from "react";
-import Layout from "../components/Layout";
-import { useNavigate } from "react-router-dom";
-import { addAndUpdateUserData, getUserData } from "../components/Database";
+import { addAndUpdateUserData } from "../components/Database";
 
-function Settings({user, setUser, goal, setGoal, height, setHeight, weight, setWeight}) {
+function Settings({user, setUser, goal, setGoal, height, setHeight, weight, setWeight, loading, setLoading}) {
   const [localGoal, setLocalGoal] = useState("stay healthy");
   const [localHeight, setLocalHeight] = useState(175);
   const [localWeight, setLocalWeight] = useState(75);
@@ -13,27 +11,7 @@ function Settings({user, setUser, goal, setGoal, height, setHeight, weight, setW
   const weightEdit = useRef(null);
   const goalSelect = useRef(null);
 
-  const [loading, setLoading] = useState(true);
-
-  useEffect( ()=> {
-    const getData = async ()=> {
-      const [success,data] = await getUserData(user.uid);
-      
-      if (success) {
-        if (data.email == user.email) {
-          setLocalGoal(data.goal);
-          setLocalHeight(data.height);
-          setLocalWeight(data.weight);
-        }
-        setLoading(false);
-      }
-      else {
-        setLoading(false);
-      }
-    };
-    
-    getData();
-  },[]);
+  //const [loading, setLoading] = useState(false);
 
   useEffect(()=>{
     setLocalGoal(goal);
@@ -82,7 +60,7 @@ function Settings({user, setUser, goal, setGoal, height, setHeight, weight, setW
     }
 
     if (allIsVerified) {
-      addAndUpdateUserData(user.uid, user.email, user.displayName, localHeight, localWeight, localGoal);
+      addAndUpdateUserData(user.uid, user.email, user.displayName, parseFloat(localHeight), parseFloat(localWeight), localGoal);
     }
   }
 

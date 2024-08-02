@@ -11,7 +11,6 @@ import { Navigate, useNavigate } from 'react-router-dom';
 
 function Home({user,setUser}) {
   
-  const [isLoaded, setIsLoaded] = useState(false);
   const navigate = useNavigate();
 
   //set the user here (signInWithPopUp)
