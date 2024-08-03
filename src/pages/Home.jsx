@@ -10,7 +10,6 @@ import { Navigate, useNavigate } from 'react-router-dom';
 
 
 function Home({user,setUser}) {
-  
   const navigate = useNavigate();
 
   //set the user here (signInWithPopUp)
@@ -19,6 +18,9 @@ function Home({user,setUser}) {
     {
       setUser(currentUser);
       sessionStorage.setItem("user",JSON.stringify(currentUser));
+      navigate("/dashboard");
+    }
+    else if (currentUser && user) { //got server user and local user
       navigate("/dashboard");
     }
   });
@@ -35,14 +37,12 @@ function Home({user,setUser}) {
 
   return (
     <div className="min-h-screen h-full flex flex-col justify-center bg-slate-950">
-      <div className={`mx-auto text-slate-50 text-center font-bold text-5xl textGemini`}>Diet.ai</div>
-      <p className="text-slate-50 text-center font-semibold text-3xl">Plan your diet with <span className="textGemini">Gemini</span> AI</p>
-      <button onClick={handleSignIn} className={`mx-auto my-2 text-slate-50 font-semibold py-1 px-2 rounded bgGemini hover:from-gemini-end hover:to-gemini-start`}><FontAwesomeIcon icon={faGoogle}/> Sign in with Google
-      </button>
-      {/* <button className='text-slate-50 text-center' onClick={()=>{
-        navigate("/dashboard");
-      }}>Go To Dashboard</button> */}
+    <div className={`mx-auto text-slate-50 text-center font-bold text-5xl textGemini`}>Diet.ai</div>
+    <p className="text-slate-50 text-center font-semibold text-3xl">Plan your diet with <span className="textGemini">Gemini</span> AI</p>
+    <button onClick={handleSignIn} className={`mx-auto my-2 text-slate-50 font-semibold py-1 px-2 rounded bgGemini hover:from-gemini-end hover:to-gemini-start`}><FontAwesomeIcon icon={faGoogle}/> Sign in with Google
+    </button>
     </div>
+    
   );
 }
 

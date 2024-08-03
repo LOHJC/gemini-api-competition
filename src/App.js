@@ -3,7 +3,7 @@ import './App.css';
 
 import { useEffect, useState } from 'react';
 
-import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
@@ -11,9 +11,13 @@ import Settings from './pages/Settings';
 import Layout from './components/Layout';
 import Recipes from './pages/Recipes';
 import { CookiesProvider, useCookies } from 'react-cookie';
-import { getRecipe, getUserData, getGeneratedCount} from "./components/Database";
+import { getRecipe, getUserData, getGeneratedCount, addAndUpdateUserData, addAndUpdateRecipe} from "./components/Database";
 
 function App() {
+  const HEIGHT = 178;
+  const WEIGHT = 75;
+  const GOAL = "stay healthy";
+
   const [user, setUser] = useState(() => {
     const storedUser = sessionStorage.getItem('user');
     return (storedUser && storedUser !== "undefined") ? JSON.parse(storedUser) : null;
@@ -21,9 +25,9 @@ function App() {
   const [recipes, setRecipes] = useState([]);
   
   //user data
-  const [goal, setGoal] = useState("stay healthy");
-  const [height, setHeight] = useState(178);
-  const [weight, setWeight] = useState(75);
+  const [goal, setGoal] = useState(GOAL);
+  const [height, setHeight] = useState(HEIGHT);
+  const [weight, setWeight] = useState(WEIGHT);
 
   const [generating, setGenerating] = useState(false);
 
@@ -41,8 +45,10 @@ function App() {
       const [success,data] = await getRecipe(user.uid,i.toString());
       if (success)
         nextRecipes.push(data);
-      else
+      else {
         nextRecipes.push({})
+        await addAndUpdateRecipe(user.uid,i.toString(),{});
+      }
 
     }
     setRecipes(nextRecipes);
@@ -57,6 +63,9 @@ function App() {
         setHeight(data.height);
         setWeight(data.weight);
       }
+    }
+    else { //no such user data
+      await addAndUpdateUserData(user.uid, user.email, user.displayName, parseFloat(height), parseFloat(weight), goal);
     }
   };
 
@@ -87,6 +96,13 @@ function App() {
     if (user) {
       getAllDataFromServer();
     }
+    else { //no user, restore all value to default
+      setLoading(true);
+      setGoal(GOAL);
+      setHeight(HEIGHT);
+      setWeight(WEIGHT);
+      setRecipes([]);
+    }
   },[user]);
 
   return (
@@ -98,10 +114,10 @@ function App() {
           {/* <Route index element={<Home user={user} setUser={setUser}/>} />
           <Route path="dashboard" element={<Dashboard user={user}/>}/>
           <Route path="settings" element={<Settings user={user} setUser={setUser}/>} /> */}
-          <Route path="/" element={<Layout user={user} setUser={setUser}/>}>
-            <Route path="/dashboard" element={<Dashboard user={user} setUser={setUser} goal={goal} height={height} weight={weight} recipes={recipes} setRecipes={setRecipes} generating={generating} setGenerating={setGenerating} aiCount={aiCount} setAICount={setAICount}/>} />
+          <Route path="/" element={<Layout user={user} setUser={setUser} loading={loading}/>}>
+            <Route path="/dashboard" element={<Dashboard user={user} setUser={setUser} goal={goal} height={height} weight={weight} recipes={recipes} setRecipes={setRecipes} generating={generating} setGenerating={setGenerating} aiCount={aiCount} setAICount={setAICount} />} />
             <Route path="/recipes" element={<Recipes user={user} setUser={setUser} goal={goal} height={height} weight={weight} recipes={recipes} setRecipes={setRecipes} generating={generating} setGenerating={setGenerating} aiCount={aiCount} setAICount={setAICount}/>} />
-            <Route path="/settings" element={<Settings user={user} setUser={setUser} goal={goal} setGoal={setGoal} height={height} setHeight={setHeight} weight={weight} setWeight={setWeight} loading={loading} setLoading={setLoading}/>} />
+            <Route path="/settings" element={<Settings user={user} setUser={setUser} goal={goal} setGoal={setGoal} height={height} setHeight={setHeight} weight={weight} setWeight={setWeight}/>} />
           </Route>
         </Routes>
       </BrowserRouter>

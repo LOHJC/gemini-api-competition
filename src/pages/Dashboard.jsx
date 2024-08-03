@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 import { useEffect, useRef, useState } from "react";
 import { model} from "../lib/geminiSetup";
-import { addAndUpdateRecipe, getGeneratedCount, decreaseGeneratedCount } from "../components/Database";
+import { addAndUpdateRecipe, decreaseGeneratedCount } from "../components/Database";
 
 function Dashboard({user, goal, height, weight, recipes, setRecipes, generating, setGenerating, aiCount, setAICount}) {
     const buttonRef = useRef(null);
@@ -102,19 +102,8 @@ function Dashboard({user, goal, height, weight, recipes, setRecipes, generating,
 
         // Step 3: Format and display the extracted information
         const recipeJson = JSON.parse(recipeResponse);
-        if (recipes.length != 0 && Object.keys(recipeJson).length != 0) {
-            nextRecipes = recipes.map((recipe, index) => {
-            if (index === dayIndex) {
-                return recipeJson;
-            } else {
-                return recipe;
-            }
-            });
-        }
-        else if(Object.keys(recipeJson).length > 0){
-            if (recipes.length == 0) {
-                //recipes list are empty
-                nextRecipes = []
+        if (recipes.length==0) { //do not have local recipes
+            if (Object.keys(recipeJson).length > 0) {
                 for (let i=0; i<7; i++) {
                     if (i==dayIndex) {
                         await addAndUpdateRecipe(user.uid,i.toString(),recipeJson);
@@ -126,6 +115,20 @@ function Dashboard({user, goal, height, weight, recipes, setRecipes, generating,
                 }
             }
         }
+        else if (Object.keys(recipeJson).length > 0) { //have local recipes
+            nextRecipes = [];
+            for (let i=0; i<7; i++) {
+                if (i==dayIndex) {
+                    await addAndUpdateRecipe(user.uid,i.toString(),recipeJson);
+                    nextRecipes.push(recipeJson)
+                }
+                else {
+                    nextRecipes.push(recipes[i]);
+                }
+
+            };
+        }
+        //console.log("nextRecipes:",nextRecipes);
         setRecipes(nextRecipes);
     }
 
@@ -133,7 +136,7 @@ function Dashboard({user, goal, height, weight, recipes, setRecipes, generating,
         <div className="min-h-screen h-full text-center bg-slate-950 text-slate-50">
             <div className="mx-auto font-extrabold text-3xl textGemini inline">Dashboard</div>
             {/* <div>{user.displayName}'s goal: <span className="capitalize">{goal}</span></div> */}
-            <div>{recipes.length>0?formatRecipe(recipes[dayIndex]):""}</div>
+            <div>{recipes.length>0?formatRecipe(recipes[dayIndex]):<div className="font-bold">No Recipe</div>}</div>
             <button ref={buttonRef} className="buttonActive w-40" onClick={generateRecipeOfTheDay}>Im feeling lucky</button>
         </div>
     );

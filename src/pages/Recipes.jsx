@@ -129,6 +129,7 @@ function Recipes({user, goal, height, weight, recipes, setRecipes, generating, s
             return 1;
         });
 
+        //console.log("recipeArray:",recipeArray)
         setRecipes(recipeArray);
     }
 
