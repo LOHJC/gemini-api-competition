@@ -19,15 +19,15 @@
 }
 
 .buttonActive {
-  @apply text-slate-50 bgGemini m-2 rounded-full px-2 py-2;
+  @apply text-slate-50 bgGemini m-2 px-2 py-2 rounded-xl sm:rounded-full;
 }
 
 .buttonNotActive {
-  @apply textGemini m-2 rounded-full px-2 py-2;
+  @apply textGemini m-2 px-2 py-2 rounded-xl sm:rounded-full;
 }
 
 .dropdownContainer {
-  @apply text-slate-950 rounded text-center w-52;
+  @apply text-slate-950 rounded text-center w-52 py-2;
 }
 
 .dropdownOption {
