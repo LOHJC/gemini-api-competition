@@ -69,9 +69,9 @@ function Recipes({user, goal, height, weight, recipes, setRecipes, generating, s
                         }
                     }
 
-                    return (<div key={index} className="mx-0.5 m-2 border-solid border-2 border-slate-300  text-slate-50 rounded flex flex-col items-center w-3/12 min-w-min">
+                    return (<div key={index} className="mx-0.5 my-2 border-solid border-2 border-slate-300 text-slate-50 rounded flex flex-col items-center w-10/12 sm:w-5/12 xl:w-96">
                         <div className="text-xl font-bold bg-slate-50 text-slate-950 w-full">Recipe for <span className="textGemini">{day}</span></div>
-                        <div className="text-xl font-bold ">{recipe_name}
+                        <div className="text-xl font-bold px-2">{recipe_name}
                             <span className="text-xs font-normal text-slate-300"> {calories} calories</span>
                         </div>
                         <div className="m-3">
